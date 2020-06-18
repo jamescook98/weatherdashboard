@@ -20,6 +20,14 @@
       background-color: lightseagreen;
       ;
     }
+
+    .dayBox {
+
+      background-color: mediumslateblue;
+      display: inline-block;
+      padding: 12px;
+      margin: 12px;
+    }
   </style>
 </head>
 
@@ -41,35 +49,63 @@
       </aside>
 
       <div class="col-lg-9">
-        <div id="today" class="mt-3">today</div>
-        <div id="forecast" class="mt-3">forecast</div>
+        <p style="text-align: center;" id="currentDateTime"></p>
+        <div id="today" class="mt-3"><br>
+        </div>
+        <div id="forecast"></div>
+        <div id="responseTest" class="mt-3">response:</div>
       </div>
     </div>
   </div>
 
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <!-- moment.js link -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+
   <script type="text/javascript">
 
     var apiKey = "12252e759fa1b709a8d5846e74ded817";
+    var queryURL = "https://api.openweathermap.org/data/2.5/forecast?q=";
 
-    var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=";
+    var days = ["day1", "day2", "day3", "day4", "day5"];
+    var now = moment().format('MMMM Do YYYY');
 
 
+    $("#currentDateTime").text(now);
 
 
     $("#search-button").click(function () {
       var cityName = $("#search-value").val();
-      console.log(cityName);
       queryURL = queryURL + cityName + "&appid=12252e759fa1b709a8d5846e74ded817";
       console.log(queryURL);
       $.ajax({
         url: queryURL,
         method: "GET"
       }).then(function (response) {
-        $("#forecast").text(JSON.stringify(response));
+        var forecast = response.list[0];
+
+
+        $("#today").append($("<p>").text("Temperature: " + toFahrenheit(forecast.main.temp) + "°F"));
+        $("#today").append($("<p>").text("Humidity: " + forecast.main.humidity + "%"));
+        $("#today").append($("<p>").text("Wind Speed: " + forecast.wind.speed + " MPH"));
+
+        for (i = 0; i < days.length; i++) {
+          var dayBoxId = "dayBox"+i;
+          $("#forecast").append($('<div class="dayBox" id="'+dayBoxId+'">'));
+          var dayBox = $("#"+dayBoxId);
+     
+          var fiveDayForecast = response.list[(8 * i)];
+          dayBox.append($("<p>").text(moment().add(i + 1, 'days').format('LL')));
+          dayBox.append($("<p>").text("Humidity: " + fiveDayForecast.main.humidity + "%"));
+          dayBox.append($("<p>").text("Temp: " + toFahrenheit(fiveDayForecast.main.temp) + "°F"));
+        }
+
       });
     });
 
+    function toFahrenheit(kelvin) {
+      return (((parseFloat(kelvin) - 273.15) * (9 / 5)) + 32).toFixed(2);
+    }
   </script>
 </body>
 
