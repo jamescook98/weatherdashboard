@@ -17,11 +17,17 @@
       padding: 12px;
     }
 
+    #forecast {
+      background-color: whitesmoke;
+      margin: 12px;
+      padding: 12px;
+    }
+
     .dayBox {
       background-color: dodgerblue;
       display: inline-block;
       padding: 12px;
-      margin: 12px;
+      margin: 6px;
     }
   </style>
 </head>
@@ -37,14 +43,13 @@
         <h5 class="mt-1">Search for a City:</h5>
         <div class="form-inline form-group">
           <input class="form-control" type="text" id="search-value" />
-          <button class="btn btn-primary" id="search-button"> <i class="fa fa-search"></i> </button>
-          <button id="testBtn">test</button>
+          <button class="btn btn-primary" id="search-button"> <i class="fa fa-search"></i> </button><br>
         </div>
 
-        <ul class="list-group history"></ul>
+        <ul class="list-group history" id="history"></ul>
       </aside>
 
-      <div class="col-lg-9" id="emptyTest">
+      <div class="col-lg-9">
         <div id="today" class="mt-3"><br>
         </div>
         <div id="forecast"></div>
@@ -72,16 +77,15 @@
     var days = ["day1", "day2", "day3", "day4", "day5"];
 
     $("#search-button").click(function () {
-      
+      deleter();
       getWeather();
-    });
-
-    $("#test").click(function () {
-      $("#emptyTest".html(""));
     });
 
     function getWeather() {
       var cityName = $("#search-value").val();
+      $("#history").append('<li>'+cityName+'</li>');
+
+      var queryURL = "https://api.openweathermap.org/data/2.5/forecast?q=";
       queryURL = queryURL + cityName + "&appid=12252e759fa1b709a8d5846e74ded817";
       console.log(queryURL);
 
@@ -94,14 +98,14 @@
         var todayIcon = $("<img>").attr("src", "http://openweathermap.org/img/w/" + forecast.weather[0].icon + ".png");
         var todaysDate = moment().format('LL');
 
-        $("#today").append($("<p>").text(titleCase(cityName) + " (" + todaysDate + ")"));
+        $("#today").append($("<h3>").text(titleCase(cityName) + " (" + todaysDate + ")"));
         $("#today").append(todayIcon);
         $("#today").append($("<p>").text("Temperature: " + toFahrenheit(forecast.main.temp) + "°F"));
         $("#today").append($("<p>").text("Humidity: " + forecast.main.humidity + "%"));
         $("#today").append($("<p>").text("Wind Speed: " + forecast.wind.speed + " MPH"));
-
         UVIndex(response.city.coord.lat, response.city.coord.lon);
 
+        $("#forecast").append($("<h3>").text("5 Day Forecast"));
         for (i = 0; i < days.length; i++) {
           var dayBoxId = "dayBox" + i;
           $("#forecast").append($('<div class="dayBox" id="' + dayBoxId + '">'));
@@ -119,6 +123,21 @@
       });
     }
 
+    $("#history").click(function (){
+      console.log("clicked");
+      var item = $("<li>");
+      console.log(item);
+    });
+
+    function deleter(){
+      console.log("before delete");
+      var today = $("#today");
+      var forecast = $("#forecast");
+      today.empty();
+      forecast.empty();
+      console.log("after delete");
+    }
+
     function UVIndex(latitude, longitude) {
       $.ajax({
         "url": "https://api.openweathermap.org/data/2.5/uvi?APPID=" + apiKey + "&lat=" + latitude + "&lon=" + longitude,
@@ -126,7 +145,6 @@
       }).then(function (response) {
         var UVIndex = parseFloat(response.value).toFixed(2);
         var color;
-
         if (UVIndex <= 2) {
           color = "green";
         } else if (UVIndex <= 7) {
