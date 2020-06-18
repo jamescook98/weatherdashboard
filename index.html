@@ -45,7 +45,6 @@
           <input class="form-control" type="text" id="search-value" />
           <button class="btn btn-primary" id="search-button"> <i class="fa fa-search"></i> </button><br>
         </div>
-
         <ul class="list-group history" id="history"></ul>
       </aside>
 
@@ -64,26 +63,35 @@
   <script type="text/javascript">
     /* 
       TODO:
-
-      -figure out how to search multiple times without refreshing
       -search history
       -make responsive
       
+      function colorRed(cityName){
+      $("#history").find("#"+cityName+"Li").css("color", "red");
+    }
+
+      when you click an item in the list, whose id is cityNameLi,
+      it calls getWeather(cityName)
     */
 
     var apiKey = "12252e759fa1b709a8d5846e74ded817";
     var queryURL = "https://api.openweathermap.org/data/2.5/forecast?q=";
-
+  
     var days = ["day1", "day2", "day3", "day4", "day5"];
 
+    if (localStorage.getItem('lastCalled') !== null){
+      getWeather(localStorage.getItem('lastCalled'))
+    }
+   
     $("#search-button").click(function () {
       deleter();
-      getWeather();
+      var cityName = $("#search-value").val();
+      getWeather(cityName);
     });
 
-    function getWeather() {
-      var cityName = $("#search-value").val();
-      $("#history").append('<li>'+cityName+'</li>');
+    function getWeather(cityName) {
+      $("#history").append('<li class="historyLi" id="' + cityName + 'Li">' + titleCase(cityName) + '</li>');
+      localStorage.setItem("lastCalled", cityName);
 
       var queryURL = "https://api.openweathermap.org/data/2.5/forecast?q=";
       queryURL = queryURL + cityName + "&appid=12252e759fa1b709a8d5846e74ded817";
@@ -123,13 +131,7 @@
       });
     }
 
-    $("#history").click(function (){
-      console.log("clicked");
-      var item = $("<li>");
-      console.log(item);
-    });
-
-    function deleter(){
+    function deleter() {
       console.log("before delete");
       var today = $("#today");
       var forecast = $("#forecast");
