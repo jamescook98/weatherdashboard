@@ -11,6 +11,10 @@
 
   <title>Weather Dashboard</title>
   <style>
+    p {
+      margin: 0px
+    }
+
     #today {
       background-color: whitesmoke;
       margin: 12px;
@@ -25,9 +29,30 @@
 
     .dayBox {
       background-color: dodgerblue;
+      color: white;
       display: inline-block;
       padding: 12px;
       margin: 6px;
+    }
+
+    li {
+      list-style-type: none;
+      background-color: paleturquoise;
+      width: 250px;
+      height: 50px;
+      border: 1px solid grey;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 500px) {
+      .dayBox {
+        font-size: 13px;
+        display: inline-block;
+        padding: 6px;
+      }
     }
   </style>
 </head>
@@ -76,22 +101,84 @@
 
     var apiKey = "12252e759fa1b709a8d5846e74ded817";
     var queryURL = "https://api.openweathermap.org/data/2.5/forecast?q=";
-  
+
     var days = ["day1", "day2", "day3", "day4", "day5"];
 
-    if (localStorage.getItem('lastCalled') !== null){
-      getWeather(localStorage.getItem('lastCalled'))
-    }
-   
+
+
     $("#search-button").click(function () {
       deleter();
       var cityName = $("#search-value").val();
       getWeather(cityName);
     });
 
-    function getWeather(cityName) {
-      $("#history").append('<li class="historyLi" id="' + cityName + 'Li">' + titleCase(cityName) + '</li>');
+    $(function () {
+      $(document).on("click", ".historyLi", function () {
+        var cityName = $(this).text();
+        $("#search-value").val(cityName);
+        console.log("clicked" + cityName);
+        console.log($("#search-value").val());
+        deleter();
+        getWeather(cityName);
+      });
+    });
+
+    function findInHistory(cityName) {
+      var lis = document.getElementById("history").getElementsByTagName("li");
+      if (lis !== null) {
+        for (i = 0; i < lis.length; i++) {
+          if (lis[i].innerHTML == cityName) {
+            return lis[i];
+          }
+        }
+      }
+      return null;
+    }
+
+    function updateHistory(cityName) {
       localStorage.setItem("lastCalled", cityName);
+      var cityHistory = [];
+      var lis = document.getElementById("history").getElementsByTagName("li");
+      if (lis !== null) {
+        for (i = 0; i < lis.length; i++) {
+          cityHistory.push(lis[i].innerHTML);
+        }
+      }
+      localStorage.setItem("history", JSON.stringify(cityHistory));
+    }
+
+    function populateFromHistory() {
+      var cityHistory = JSON.parse(localStorage.getItem("history"));
+      if (cityHistory !== null) {
+        for (i = 0; i < cityHistory.length; i++) {
+          var cityName = cityHistory[i];
+          $("#history").append('<li class="historyLi" id="' + cityName + 'Li">' + titleCase(cityName) + '</li>');
+        }
+      }
+      if (localStorage.getItem('lastCalled') !== null) {
+        getWeather(localStorage.getItem('lastCalled'))
+      }
+    }
+
+    $(document).ready(populateFromHistory());
+
+
+    function getWeather(cityName) {
+      var foundCity = findInHistory(cityName);
+      if (foundCity !== null) {
+        foundCity.parentNode.removeChild(foundCity);
+        console.log("found");
+      } else {
+        var lis = document.getElementById("history").getElementsByTagName("li");
+        if (lis !== null && lis.length >= 8) {
+          foundCity = lis[lis.length - 1];
+          foundCity.parentNode.removeChild(foundCity);
+        }
+      }
+
+      $("#history").prepend('<li class="historyLi" id="' + cityName + 'Li">' + titleCase(cityName) + '</li>');
+
+      updateHistory(cityName);
 
       var queryURL = "https://api.openweathermap.org/data/2.5/forecast?q=";
       queryURL = queryURL + cityName + "&appid=12252e759fa1b709a8d5846e74ded817";
