@@ -1,0 +1,43 @@
+p {
+    margin: 0px
+}
+
+#today {
+    background-color: whitesmoke;
+    margin: 12px;
+    padding: 12px;
+}
+
+#forecast {
+    background-color: whitesmoke;
+    margin: 12px;
+    padding: 12px;
+}
+
+.dayBox {
+    background-color: dodgerblue;
+    color: white;
+    display: inline-block;
+    padding: 12px;
+    margin: 6px;
+}
+
+li {
+    list-style-type: none;
+    background-color: #E5E8E8;
+    width: 250px;
+    height: 50px;
+    border: 1px solid grey;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 500px) {
+    .dayBox {
+      font-size: 13px;
+      display: inline-block;
+      padding: 6px;
+    }
+}
