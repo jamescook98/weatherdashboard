@@ -1,7 +1,9 @@
 
-[Link to project](jamescook98.github.io/weatherdashboard)
+https://jamescook98.github.io/weatherdashboard
 
-This is a basic weather application that retrieves information from the OpenWeather API. The user enters the name of a city and the app displays today's weather, the UV index, and a 5-day forecast for that city.
+This is a basic weather application that retrieves information from the OpenWeather API. The user enters the name of a city and the app displays today's weather, the UV index, and a 5-day forecast for that city. It uses jQuery, moment.js, and Bootstrap. All HTML is responsive and valid.
+
+![screenshot of weather dashboard](functionality.gif)
 
 GIVEN a weather dashboard with form inputs
 WHEN I search for a city
